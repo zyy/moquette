@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.moquette.commons.Constants;
 import org.eclipse.moquette.server.netty.AuthenticatorType;
 import org.eclipse.moquette.spi.IMessaging;
 import org.eclipse.moquette.spi.ISessionsStore;
@@ -35,6 +36,7 @@ import org.eclipse.moquette.spi.persistence.MapDBPersistentStore;
 import org.eclipse.moquette.proto.messages.*;
 import org.eclipse.moquette.server.IAuthenticator;
 import org.eclipse.moquette.server.ServerChannel;
+import org.eclipse.moquette.spi.persistence.MongoDBPersistentStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,9 +160,15 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
 
     private void processInit(Properties props) {
         //TODO use a property to select the storage path
-        MapDBPersistentStore mapStorage = new MapDBPersistentStore();
-        m_storageService = mapStorage;
-        m_sessionsStore = mapStorage;
+        if ("mongo".equalsIgnoreCase(props.getProperty("persistent", Constants.PERSISTENT))) {
+            MongoDBPersistentStore mapStorage = new MongoDBPersistentStore(props);
+            m_storageService = mapStorage;
+            m_sessionsStore = mapStorage;
+        } else {
+            MapDBPersistentStore mapStorage = new MapDBPersistentStore();
+            m_storageService = mapStorage;
+            m_sessionsStore = mapStorage;
+        }
 
         m_storageService.initStore();
 
@@ -168,7 +176,7 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
         //subscriptions.init(storedSubscriptions);
         subscriptions.init(m_sessionsStore);
 
-        String auth = props.getProperty("authenticator", "");
+        String auth = props.getProperty("authenticator", Constants.AUTHENTICATOR);
         LOG.debug(String.format("authenticator:%s", auth));
         IAuthenticator authenticator = null;
         if (auth.equalsIgnoreCase(AuthenticatorType.ALL)) {

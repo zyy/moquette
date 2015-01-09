@@ -32,7 +32,10 @@ public class Subscription implements Serializable {
     String topicFilter;
     boolean cleanSession;
     boolean active = true;
-    
+
+    public Subscription() {
+    }
+
     public Subscription(String clientId, String topicFilter, QOSType requestedQos, boolean cleanSession) {
         this.requestedQos = requestedQos;
         this.clientId = clientId;
