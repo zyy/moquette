@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.moquette.server.netty.AuthenticatorType;
 import org.eclipse.moquette.spi.IMessaging;
 import org.eclipse.moquette.spi.ISessionsStore;
 import org.eclipse.moquette.spi.IMessagesStore;
@@ -38,11 +39,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * Singleton class that orchestrate the execution of the protocol.
- *
+ * <p/>
  * Uses the LMAX Disruptor to serialize the incoming, requests, because it work in a evented fashion;
- * the requests income from front Netty connectors and are dispatched to the 
+ * the requests income from front Netty connectors and are dispatched to the
  * ProtocolProcessor.
  *
  * @author andrea
@@ -50,9 +50,9 @@ import org.slf4j.LoggerFactory;
 public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleMessaging.class);
-    
+
     private SubscriptionsStore subscriptions;
-    
+
     private RingBuffer<ValueEvent> m_ringBuffer;
 
     private IMessagesStore m_storageService;
@@ -62,12 +62,12 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
     private Disruptor<ValueEvent> m_disruptor;
 
     private static SimpleMessaging INSTANCE;
-    
+
     private final ProtocolProcessor m_processor = new ProtocolProcessor();
     private final AnnotationSupport annotationSupport = new AnnotationSupport();
-    
+
     CountDownLatch m_stopLatch;
-    
+
     private SimpleMessaging() {
     }
 
@@ -95,17 +95,17 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
 //        disruptorPublish(new InitEvent(configProps));
     }
 
-    
+
     private void disruptorPublish(MessagingEvent msgEvent) {
         LOG.debug("disruptorPublish publishing event {}", msgEvent);
         long sequence = m_ringBuffer.next();
         ValueEvent event = m_ringBuffer.get(sequence);
 
         event.setEvent(msgEvent);
-        
-        m_ringBuffer.publish(sequence); 
+
+        m_ringBuffer.publish(sequence);
     }
-    
+
     @Override
     public void lostConnection(String clientID) {
         disruptorPublish(new LostConnectionEvent(clientID));
@@ -134,7 +134,7 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
             LOG.error(null, ex);
         }
     }
-    
+
     @Override
     public void onEvent(ValueEvent t, long l, boolean bln) throws Exception {
         MessagingEvent evt = t.getEvent();
@@ -142,13 +142,13 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
         if (evt instanceof StopEvent) {
             processStop();
             return;
-        } 
+        }
         if (evt instanceof LostConnectionEvent) {
             LostConnectionEvent lostEvt = (LostConnectionEvent) evt;
             m_processor.processConnectionLost(lostEvt.getClientID());
             return;
         }
-        
+
         if (evt instanceof ProtocolEvent) {
             ServerChannel session = ((ProtocolEvent) evt).getSession();
             AbstractMessage message = ((ProtocolEvent) evt).getMessage();
@@ -163,21 +163,31 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
         m_sessionsStore = mapStorage;
 
         m_storageService.initStore();
-        
+
         //List<Subscription> storedSubscriptions = m_sessionsStore.listAllSubscriptions();
         //subscriptions.init(storedSubscriptions);
         subscriptions.init(m_sessionsStore);
-        
-        String passwdPath = props.getProperty("password_file", "");
-        String configPath = System.getProperty("moquette.path", null);
-        IAuthenticator authenticator;
-        if (passwdPath.isEmpty()) {
+
+        String auth = props.getProperty("authenticator", "");
+        LOG.debug(String.format("authenticator:%s", auth));
+        IAuthenticator authenticator = null;
+        if (auth.equalsIgnoreCase(AuthenticatorType.ALL)) {
             authenticator = new AcceptAllAuthenticator();
-        } else {
-            authenticator = new FileAuthenticator(configPath, passwdPath);
+        } else if (auth.equalsIgnoreCase(AuthenticatorType.FILE)) {
+            String passwdPath = props.getProperty("password_file", "");
+            String configPath = System.getProperty("moquette.path", null);
+            if (!passwdPath.isEmpty()) {
+                authenticator = new FileAuthenticator(configPath, passwdPath);
+            }
+        } else if (auth.equalsIgnoreCase(AuthenticatorType.DB)) {
+            authenticator = new DBAuthenticator(props);
         }
-        
-        m_processor.init(subscriptions, m_storageService, m_sessionsStore, authenticator);
+
+        if (null != authenticator) {
+            m_processor.init(subscriptions, m_storageService, m_sessionsStore, authenticator);
+        } else {
+            LOG.error("init authenticator error");
+        }
     }
 
 
@@ -187,7 +197,7 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
         LOG.debug("subscription tree {}", subscriptions.dumpTree());
 //        m_eventProcessor.halt();
 //        m_executor.shutdown();
-        
+
         subscriptions = null;
         m_stopLatch.countDown();
     }

@@ -116,4 +116,14 @@ class ConfigurationParser {
     Properties getProperties() {
         return m_properties;
     }
+
+    public static void main(String[] args) throws Exception {
+        FileReader reader = new FileReader(new File("e:/moquette.conf"));
+        ConfigurationParser parser = new ConfigurationParser();
+        parser.parse(reader);
+        Properties properties = parser.getProperties();
+        for(String name : properties.stringPropertyNames()) {
+            System.out.println(properties.get(name));
+        }
+    }
 }

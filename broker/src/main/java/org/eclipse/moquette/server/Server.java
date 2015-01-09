@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
  * @author andrea
  */
 public class Server {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-    
+
     public static final String STORAGE_FILE_PATH = System.getProperty("user.home") +
             File.separator + "moquette_store.mapdb";
 
     private ServerAcceptor m_acceptor;
     SimpleMessaging messaging;
-    
+
     public static void main(String[] args) throws IOException {
         final Server server = new Server();
         server.startServer();
@@ -49,14 +49,15 @@ public class Server {
             }
         });
     }
-    
+
     /**
-     * Starts Moquette bringing the configuration from the file 
+     * Starts Moquette bringing the configuration from the file
      * located at config/moquette.conf
      */
     public void startServer() throws IOException {
         String configPath = System.getProperty("moquette.path", null);
         startServer(new File(configPath, "config/moquette.conf"));
+        //startServer(new File(configPath, "E:/moquette.conf"));
     }
 
     /**
@@ -75,10 +76,10 @@ public class Server {
         Properties configProps = confParser.getProperties();
         startServer(configProps);
     }
-    
+
     /**
      * Starts the server with the given properties.
-     * 
+     *
      * Its need at least the following properties:
      * <ul>
      *  <li>port</li>
@@ -88,11 +89,11 @@ public class Server {
     public void startServer(Properties configProps) throws IOException {
         messaging = SimpleMessaging.getInstance();
         messaging.init(configProps);
-        
+
         m_acceptor = new NettyAcceptor();
         m_acceptor.initialize(messaging, configProps);
     }
-    
+
     public void stopServer() {
         System.out.println("Server stopping...");
         messaging.stop();
