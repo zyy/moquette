@@ -32,9 +32,10 @@ public class SubscriptionsDao extends BasicDAO<Subscriptions, Serializable> {
         query.filter("clientID", clientID);
         Subscriptions subscriptions = findOne(query);
         boolean save = false;
-        if (null == subscriptions)
+        if (null == subscriptions) {
             save = true;
-        subscriptions = new Subscriptions(clientID, new HashSet<Subscription>());
+            subscriptions = new Subscriptions(clientID, new HashSet<Subscription>());
+        }
 
         Set<Subscription> subs = subscriptions.getSubscriptions();
         if (!subs.contains(newSubscription)) {
