@@ -2,7 +2,6 @@ package org.eclipse.moquette.spi.persistence.dao;
 
 import com.mongodb.WriteResult;
 import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
-import org.eclipse.moquette.spi.persistence.model.Retained;
 import org.eclipse.moquette.spi.persistence.model.Subscriptions;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.dao.BasicDAO;
@@ -81,7 +80,8 @@ public class SubscriptionsDao extends BasicDAO<Subscriptions, Serializable> {
         List<Subscriptions> subscriptions = find().asList();
         List<Subscription> list = new ArrayList<Subscription>();
         for (Subscriptions sub : subscriptions) {
-            list.addAll(sub.getSubscriptions());
+            if (sub.getSubscriptions() != null)
+                list.addAll(sub.getSubscriptions());
         }
         return list;
     }
