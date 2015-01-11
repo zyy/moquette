@@ -1,6 +1,7 @@
 package org.eclipse.moquette.spi.persistence.model;
 
 import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 public class Subscriptions {
     @Id
     private String clientID;
+    @Embedded
     private Set<Subscription> subscriptions;
 
     public String getClientID() {

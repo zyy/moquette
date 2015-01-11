@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.WriteResult;
 import org.eclipse.moquette.spi.impl.events.PublishEvent;
 import org.eclipse.moquette.spi.impl.storage.StoredPublishEvent;
+import org.eclipse.moquette.spi.persistence.MongoDBPersistentStore;
 import org.eclipse.moquette.spi.persistence.model.Persistent;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.dao.BasicDAO;
@@ -12,6 +13,7 @@ import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,12 +28,20 @@ public class PersistentDao extends BasicDAO<Persistent, Serializable> {
         return getDs().createQuery(getEntityClazz());
     }
 
-    public UpdateResults saveEvent(PublishEvent evt) {
+    public void saveEvent(PublishEvent evt) {
         Query query = getQuery();
         query.filter("clientID", evt.getClientID());
-        UpdateOperations opts = getDs().createUpdateOperations(getEntityClazz());
-        opts.add("events", evt);
-        return update(query, opts);
+        Persistent persistentEvt = findOne(query);
+        if (null == persistentEvt) {
+            List<StoredPublishEvent> events = new ArrayList<StoredPublishEvent>();
+            events.add(MongoDBPersistentStore.convertToStored(evt));
+            persistentEvt = new Persistent(evt.getClientID(), events);
+            save(persistentEvt);
+        } else {
+            UpdateOperations opts = getDs().createUpdateOperations(getEntityClazz());
+            opts.add("events", MongoDBPersistentStore.convertToStored(evt));
+            update(query, opts);
+        }
     }
 
     public List<StoredPublishEvent> getByClientID(String clientID) {

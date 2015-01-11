@@ -178,12 +178,12 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
         return convertFromStored(storedEvt);
     }
 
-    private StoredPublishEvent convertToStored(PublishEvent evt) {
+    public static StoredPublishEvent convertToStored(PublishEvent evt) {
         StoredPublishEvent storedEvt = new StoredPublishEvent(evt);
         return storedEvt;
     }
 
-    private PublishEvent convertFromStored(StoredPublishEvent evt) {
+    public static PublishEvent convertFromStored(StoredPublishEvent evt) {
         byte[] message = evt.getMessage();
         ByteBuffer bbmessage = ByteBuffer.wrap(message);
         //bbmessage.flip();

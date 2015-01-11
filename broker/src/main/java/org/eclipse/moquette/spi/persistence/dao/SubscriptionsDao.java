@@ -38,7 +38,7 @@ public class SubscriptionsDao extends BasicDAO<Subscriptions, Serializable> {
         }
 
         Set<Subscription> subs = subscriptions.getSubscriptions();
-        if (!subs.contains(newSubscription)) {
+        if (subs != null && !subs.contains(newSubscription)) {
             //TODO check the subs doesn't contain another subscription to the same topic with different
             Subscription existingSubscription = null;
             for (Subscription scanSub : subs) {

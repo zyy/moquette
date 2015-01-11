@@ -1,6 +1,7 @@
 package org.eclipse.moquette.spi.persistence.model;
 
 import org.eclipse.moquette.spi.impl.storage.StoredPublishEvent;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class Persistent {
     @Id
     private String clientID;
+    @Embedded
     private List<StoredPublishEvent> events;
 
     public Persistent() {

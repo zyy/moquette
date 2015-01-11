@@ -33,6 +33,9 @@ public class PublishEvent extends MessagingEvent {
     //Optional attribute, available only fo QoS 1 and 2
     int m_msgID;
 
+    public PublishEvent() {
+    }
+
     public PublishEvent(String topic, QOSType qos, ByteBuffer message, boolean retain,
                         String clientID, Integer msgID) {
         m_topic = topic;
