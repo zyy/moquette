@@ -15,39 +15,47 @@
  */
 package org.eclipse.moquette.server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.text.ParseException;
-import java.util.Properties;
 import org.eclipse.moquette.commons.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.text.ParseException;
+import java.util.Properties;
+
 /**
  * Mosquitto configuration parser.
- * 
+ * <p/>
  * A line that at the very first has # is a comment
  * Each line has key value format, where the separator used it the space.
- * 
+ *
  * @author andrea
  */
-class ConfigurationParser {
-    
+public class ConfigurationParser {
+
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationParser.class);
-    
+
     private Properties m_properties = new Properties();
-    
-    ConfigurationParser() {
+
+    public ConfigurationParser() {
         m_properties.put("port", Integer.toString(Constants.PORT));
         m_properties.put("host", Constants.HOST);
         m_properties.put("websocket_port", Integer.toString(Constants.WEBSOCKET_PORT));
         m_properties.put("password_file", "");
+        m_properties.put("authenticator", Constants.AUTHENTICATOR);
+        m_properties.put("persistent", Constants.PERSISTENT);
+        m_properties.put("db_user", Constants.DB_USER);
+        m_properties.put("db_password", Constants.DB_PASSWORD);
+        m_properties.put("driver_class", Constants.DRIVER_CLASS);
+        m_properties.put("db_url", Constants.DB_URL);
+        m_properties.put("mongo_ip", Constants.MONGO_IP);
+        m_properties.put("mongo_port", Constants.MONGO_PORT);
+        m_properties.put("mongo_db", Constants.MONGO_DB);
+        m_properties.put("mongo_usr", Constants.MONGO_USR);
+        m_properties.put("mongo_pwd", Constants.MONGO_PWD);
+        m_properties.put("mongo_maxWaitTime", Constants.MONGO_MAXWAITTIME);
     }
-    
+
     /**
      * Parse the configuration from file.
      */
@@ -68,10 +76,10 @@ class ConfigurationParser {
             return;
         }
     }
-    
+
     /**
-     * Parse the configuration 
-     * 
+     * Parse the configuration
+     *
      * @throws ParseException if the format is not compliant.
      */
     void parse(Reader reader) throws ParseException {
@@ -80,7 +88,7 @@ class ConfigurationParser {
             LOG.warn("parsing NULL reader, so fallback on default configuration!");
             return;
         }
-        
+
         BufferedReader br = new BufferedReader(reader);
         String line;
         try {
@@ -99,12 +107,12 @@ class ConfigurationParser {
                         //skip it's a black line
                         continue;
                     }
-                    
+
                     //split till the first space
                     int deilimiterIdx = line.indexOf(' ');
                     String key = line.substring(0, deilimiterIdx).trim();
                     String value = line.substring(deilimiterIdx).trim();
-                    
+
                     m_properties.put(key, value);
                 }
             }
@@ -112,18 +120,9 @@ class ConfigurationParser {
             throw new ParseException("Failed to read", 1);
         }
     }
-    
-    Properties getProperties() {
+
+    public Properties getProperties() {
         return m_properties;
     }
 
-    public static void main(String[] args) throws Exception {
-        FileReader reader = new FileReader(new File("e:/moquette.conf"));
-        ConfigurationParser parser = new ConfigurationParser();
-        parser.parse(reader);
-        Properties properties = parser.getProperties();
-        for(String name : properties.stringPropertyNames()) {
-            System.out.println(properties.get(name));
-        }
-    }
 }

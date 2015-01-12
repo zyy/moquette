@@ -160,7 +160,7 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
 
     private void processInit(Properties props) {
         //TODO use a property to select the storage path
-        if ("mongo".equalsIgnoreCase(props.getProperty("persistent", Constants.PERSISTENT))) {
+        if ("mongo".equalsIgnoreCase(props.getProperty("persistent"))) {
             MongoDBPersistentStore mapStorage = new MongoDBPersistentStore(props);
             m_storageService = mapStorage;
             m_sessionsStore = mapStorage;
@@ -176,7 +176,7 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
         //subscriptions.init(storedSubscriptions);
         subscriptions.init(m_sessionsStore);
 
-        String auth = props.getProperty("authenticator", Constants.AUTHENTICATOR);
+        String auth = props.getProperty("authenticator");
         LOG.debug(String.format("authenticator:%s", auth));
         IAuthenticator authenticator = null;
         if (auth.equalsIgnoreCase(AuthenticatorType.ALL)) {

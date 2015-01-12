@@ -23,14 +23,14 @@ public class Constants {
     public static final int WEBSOCKET_PORT = 8080;
     public static final String HOST = "0.0.0.0";
     public static final int DEFAULT_CONNECT_TIMEOUT = 10;
-    public static final String AUTHENTICATOR = "db";
+    public static final String AUTHENTICATOR = "all";
     public static final String PERSISTENT = "mongo";
     public static final String DB_USER = "root";
     public static final String DB_PASSWORD = "root_123";
     public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
     public static final String DB_URL = "jdbc:mysql://127.0.0.1:9376/lukou?useUnicode=true&characterEncoding=UTF-8";
     public static final String MONGO_IP = "127.0.0.1";
-    public static final String MONGO_PORT = "30001";
+    public static final String MONGO_PORT = "27017";
     public static final String MONGO_DB = "moquette";
     public static final String MONGO_USR = "root";
     public static final String MONGO_PWD = "root";

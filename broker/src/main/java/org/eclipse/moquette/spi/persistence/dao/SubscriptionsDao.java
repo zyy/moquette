@@ -57,9 +57,13 @@ public class SubscriptionsDao extends BasicDAO<Subscriptions, Serializable> {
         if (save) {
             save(subscriptions);
         } else {
-            UpdateOperations opts = getDs().createUpdateOperations(getEntityClazz());
-            opts.set("subscriptions", subs);
-            update(query, opts);
+            if (subs == null || subs.size() == 0) {
+                deleteByQuery(query);
+            } else {
+                UpdateOperations opts = getDs().createUpdateOperations(getEntityClazz());
+                opts.set("subscriptions", subs);
+                update(query, opts);
+            }
         }
     }
 

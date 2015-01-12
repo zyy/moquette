@@ -57,7 +57,6 @@ public class Server {
     public void startServer() throws IOException {
         String configPath = System.getProperty("moquette.path", null);
         startServer(new File(configPath, "config/moquette.conf"));
-        //startServer(new File(configPath, "E:/moquette.conf"));
     }
 
     /**

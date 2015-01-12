@@ -29,14 +29,29 @@ import java.util.List;
 public interface IMessagesStore {
 
     public static class StoredMessage implements Serializable {
-        final AbstractMessage.QOSType m_qos;
-        final byte[] m_payload;
-        final String m_topic;
+        AbstractMessage.QOSType m_qos;
+        byte[] m_payload;
+        String m_topic;
+
+        public StoredMessage() {
+        }
 
         public StoredMessage(byte[] message, AbstractMessage.QOSType qos, String topic) {
             m_qos = qos;
             m_payload = message;
             m_topic = topic;
+        }
+
+        public AbstractMessage.QOSType getM_qos() {
+            return m_qos;
+        }
+
+        public byte[] getM_payload() {
+            return m_payload;
+        }
+
+        public String getM_topic() {
+            return m_topic;
         }
 
         public AbstractMessage.QOSType getQos() {

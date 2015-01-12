@@ -1,6 +1,5 @@
 package org.eclipse.moquette.spi.impl;
 
-import org.eclipse.moquette.commons.Constants;
 import org.eclipse.moquette.server.IAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,8 @@ public class DBAuthenticator implements IAuthenticator {
                     } catch (SQLException e) {
                     }
                 }
-                DB_CONNECTION = DriverManager.getConnection(props.getProperty("db_url", Constants.DB_URL),
-                        props.getProperty("db_user", Constants.DB_USER), props.getProperty("db_password", Constants.DB_PASSWORD));
+                DB_CONNECTION = DriverManager.getConnection(props.getProperty("db_url"),
+                        props.getProperty("db_user"), props.getProperty("db_password"));
             }
         } catch (Exception e) {
             LOG.error("dbConnection init error {}", e);
