@@ -32,7 +32,7 @@ public class MongoDBPersistentStoreTest {
         }
     }
 
-    @Test
+    //@Test
     public void overridingSubscriptions() {
         Subscription oldSubscription = new Subscription("FAKE_CLI_ID_1", "/topic", AbstractMessage.QOSType.MOST_ONE, false);
         m_storageService.addNewSubscription(oldSubscription, oldSubscription.getClientId());
