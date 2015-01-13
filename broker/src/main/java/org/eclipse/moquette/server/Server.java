@@ -64,7 +64,7 @@ public class Server {
      */
     public void startServer(File configFile) throws IOException {
         LOG.info("Using config file: " + configFile.getAbsolutePath());
-        LOG.info("Persistent store file: " + STORAGE_FILE_PATH);
+        //LOG.info("Persistent store file: " + STORAGE_FILE_PATH);
 
         ConfigurationParser confParser = new ConfigurationParser();
         try {

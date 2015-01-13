@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.moquette.commons.Constants;
+import org.eclipse.moquette.server.Server;
 import org.eclipse.moquette.server.netty.AuthenticatorType;
 import org.eclipse.moquette.spi.IMessaging;
 import org.eclipse.moquette.spi.ISessionsStore;
@@ -164,10 +165,12 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
             MongoDBPersistentStore mapStorage = new MongoDBPersistentStore(props);
             m_storageService = mapStorage;
             m_sessionsStore = mapStorage;
+            LOG.info("Persistent store file: mongodb");
         } else {
             MapDBPersistentStore mapStorage = new MapDBPersistentStore();
             m_storageService = mapStorage;
             m_sessionsStore = mapStorage;
+            LOG.info("Persistent store file: " + Server.STORAGE_FILE_PATH);
         }
 
         m_storageService.initStore();
