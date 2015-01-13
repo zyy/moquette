@@ -143,12 +143,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!--<dependency>
+        <dependency>
             <groupId>org.kaazing</groupId>
             <artifactId>robot.junit</artifactId>
             <version>0.0.0.12</version>
             <scope>test</scope>
-        </dependency>-->
+        </dependency>
 
         <!-- needs extra dependencies: objenesis & hamcrest -->
         <dependency>

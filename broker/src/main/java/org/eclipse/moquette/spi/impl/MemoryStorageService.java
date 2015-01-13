@@ -48,7 +48,12 @@ public class MemoryStorageService implements IMessagesStore, ISessionsStore {
     public void cleanRetained(String topic) {
         m_retainedStore.remove(topic);
     }
-    
+
+    @Override
+    public void saveHistoryMessage(String fromId, String toId, ByteBuffer message) {
+
+    }
+
     @Override
     public void storeRetained(String topic, ByteBuffer message, AbstractMessage.QOSType qos) {
         if (!message.hasRemaining()) {

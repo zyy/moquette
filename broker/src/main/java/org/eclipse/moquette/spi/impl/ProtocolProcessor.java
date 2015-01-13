@@ -304,7 +304,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
 
         //NB publish to subscribers for QoS 2 happen upon PUBREL from publisher
         if (qos != AbstractMessage.QOSType.EXACTLY_ONCE) {
-            publish2Subscribers(topic, qos, message, retain, messageID);
+            publish2Subscribers(clientID, topic, qos, message, retain, messageID);
         }
 
         if (qos == AbstractMessage.QOSType.LEAST_ONE) {
@@ -340,7 +340,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
     /**
      * Flood the subscribers with the message to notify. MessageID is optional and should only used for QoS 1 and 2
      * */
-    private void publish2Subscribers(String topic, AbstractMessage.QOSType qos, ByteBuffer origMessage, boolean retain, Integer messageID) {
+    private void publish2Subscribers(String clientID, String topic, AbstractMessage.QOSType qos, ByteBuffer origMessage, boolean retain, Integer messageID) {
         LOG.debug("publish2Subscribers republishing to existing subscribers that matches the topic {}", topic);
         if (LOG.isDebugEnabled()) {
             LOG.debug("content <{}>", DebugUtils.payload2Str(origMessage));
@@ -354,6 +354,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
             ByteBuffer message = origMessage.duplicate();
             LOG.debug("Broker republishing to client <{}> topic <{}> qos <{}>, active {}", 
                     sub.getClientId(), sub.getTopicFilter(), qos, sub.isActive());
+
+            m_messagesStore.saveHistoryMessage(clientID, sub.getClientId(), message);
             
             if (qos == AbstractMessage.QOSType.MOST_ONE && sub.isActive()) {
                 //QoS 0
@@ -463,7 +465,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         final String topic = evt.getTopic();
         final AbstractMessage.QOSType qos = evt.getQos();
 
-        publish2Subscribers(topic, qos, evt.getMessage(), evt.isRetain(), evt.getMessageID());
+        publish2Subscribers(clientID, topic, qos, evt.getMessage(), evt.isRetain(), evt.getMessageID());
 
         m_messagesStore.removeQoS2Message(publishKey);
 

@@ -79,6 +79,10 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     @Override
+    public void saveHistoryMessage(String fromId, String toId, ByteBuffer message) {
+    }
+
+    @Override
     public void storeRetained(String topic, ByteBuffer message, AbstractMessage.QOSType qos) {
         if (!message.hasRemaining()) {
             //clean the message from topic

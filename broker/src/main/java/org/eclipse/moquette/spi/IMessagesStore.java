@@ -109,4 +109,6 @@ public interface IMessagesStore {
     PublishEvent retrieveQoS2Message(String publishKey);
 
     void cleanRetained(String topic);
+
+    void saveHistoryMessage(String fromId, String toId, ByteBuffer message);
 }
