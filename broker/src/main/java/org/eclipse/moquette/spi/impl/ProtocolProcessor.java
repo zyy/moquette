@@ -355,11 +355,11 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
             LOG.debug("Broker republishing to client <{}> topic <{}> qos <{}>, active {}", 
                     sub.getClientId(), sub.getTopicFilter(), qos, sub.isActive());
 
-            m_messagesStore.saveHistoryMessage(clientID, sub.getClientId(), message);
-            
             if (qos == AbstractMessage.QOSType.MOST_ONE && sub.isActive()) {
                 //QoS 0
                 sendPublish(sub.getClientId(), topic, qos, message, false);
+                // store message history
+                m_messagesStore.saveHistoryMessage(clientID, sub.getClientId(), message);
             } else {
                 //QoS 1 or 2
                 //if the target subscription is not clean session and is not connected => store it
@@ -379,6 +379,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
                         sendPublish(sub.getClientId(), topic, qos, message, false);
                     }
                 }
+                // store message history
+                m_messagesStore.saveHistoryMessage(clientID, sub.getClientId(), message);
             }
         }
     }
