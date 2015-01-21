@@ -158,22 +158,26 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
         m_db.commit();
     }
 
+    @Override
     public void cleanPersistedPublishes(String clientID) {
         m_persistentMessageStore.remove(clientID);
         m_db.commit();
     }
 
+    @Override
     public void cleanInFlight(String msgID) {
         m_inflightStore.remove(msgID);
         m_db.commit();
     }
 
+    @Override
     public void addInFlight(PublishEvent evt, String publishKey) {
         StoredPublishEvent storedEvt = convertToStored(evt);
         m_inflightStore.put(publishKey, storedEvt);
         m_db.commit();
     }
 
+    @Override
     public void addNewSubscription(Subscription newSubscription, String clientID) {
         LOG.debug("addNewSubscription invoked with subscription {} for client {}", newSubscription, clientID);
         if (!m_persistentSubscriptions.containsKey(clientID)) {
@@ -202,6 +206,7 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
         m_db.commit();
     }
 
+    @Override
     public void wipeSubscriptions(String clientID) {
         m_persistentSubscriptions.remove(clientID);
         m_db.commit();
@@ -213,6 +218,7 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
         m_db.commit();
     }
 
+    @Override
     public List<Subscription> listAllSubscriptions() {
         List<Subscription> allSubscriptions = new ArrayList<Subscription>();
         for (Map.Entry<String, Set<Subscription>> entry : m_persistentSubscriptions.entrySet()) {
@@ -235,19 +241,23 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     /*-------- QoS 2  storage management --------------*/
+    @Override
     public void persistQoS2Message(String publishKey, PublishEvent evt) {
         LOG.debug("persistQoS2Message store pubKey: {}, evt: {}", publishKey, evt);
         m_qos2Store.put(publishKey, convertToStored(evt));
     }
 
+    @Override
     public void removeQoS2Message(String publishKey) {
         m_qos2Store.remove(publishKey);
     }
 
+    @Override
     public PublishEvent retrieveQoS2Message(String publishKey) {
         StoredPublishEvent storedEvt = m_qos2Store.get(publishKey);
         return convertFromStored(storedEvt);
     }
+
 
     private StoredPublishEvent convertToStored(PublishEvent evt) {
         StoredPublishEvent storedEvt = new StoredPublishEvent(evt);

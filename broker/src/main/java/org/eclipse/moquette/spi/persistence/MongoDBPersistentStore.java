@@ -136,20 +136,24 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
         persistentDao.cleanPublishes(clientID);
     }
 
+    @Override
     public void cleanInFlight(String msgID) {
         inflightDao.deleteByPublishKey(msgID);
     }
 
+    @Override
     public void addInFlight(PublishEvent evt, String publishKey) {
         StoredPublishEvent storedEvt = convertToStored(evt);
         inflightDao.saveMessage(publishKey, storedEvt);
     }
 
+    @Override
     public void addNewSubscription(Subscription newSubscription, String clientID) {
         LOG.debug("addNewSubscription invoked with subscription {} for client {}", newSubscription, clientID);
         subscriptionsDao.addNewSubscription(newSubscription, clientID);
     }
 
+    @Override
     public void wipeSubscriptions(String clientID) {
         subscriptionsDao.wipeSubscriptions(clientID);
     }
@@ -176,20 +180,24 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     /*-------- QoS 2  storage management --------------*/
+    @Override
     public void persistQoS2Message(String publishKey, PublishEvent evt) {
         LOG.debug("persistQoS2Message store pubKey: {}, evt: {}", publishKey, evt);
         qos2Dao.saveMessage(publishKey, convertToStored(evt));
     }
 
+    @Override
     public void removeQoS2Message(String publishKey) {
         qos2Dao.removeByPublishKey(publishKey);
     }
 
+    @Override
     public void saveHistoryMessage(String fromId, String toId, ByteBuffer message) {
         History msg = new History(fromId, toId, new String(message.array(), Charset.forName("UTF-8")));
         historyDao.save(msg);
     }
 
+    @Override
     public PublishEvent retrieveQoS2Message(String publishKey) {
         StoredPublishEvent storedEvt = qos2Dao.getMessageByPublishKey(publishKey);
         return convertFromStored(storedEvt);
