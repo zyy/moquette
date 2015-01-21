@@ -38,7 +38,7 @@ public class DBAuthenticator implements IAuthenticator {
 
     @Override
     public boolean checkValid(String username, String password) {
-        if (password == null)
+        if (username == null || "".equals(username) || password == null || "".equals(password))
             return false;
         long userId = Long.parseLong(username);
         String token = getTokenFromDB(userId);

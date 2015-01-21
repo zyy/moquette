@@ -196,18 +196,22 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         }
 
         //handle user authentication
+        //if (msg.isUserFlag()) {
+        String pwd = null;
+        String userName = null;
         if (msg.isUserFlag()) {
-            String pwd = null;
+            userName = msg.getUsername();
             if (msg.isPasswordFlag()) {
                 pwd = msg.getPassword();
             }
-            if (!m_authenticator.checkValid(msg.getUsername(), pwd)) {
-                ConnAckMessage okResp = new ConnAckMessage();
-                okResp.setReturnCode(ConnAckMessage.BAD_USERNAME_OR_PASSWORD);
-                session.write(okResp);
-                return;
-            }
         }
+        if (!m_authenticator.checkValid(userName, pwd)) {
+            ConnAckMessage okResp = new ConnAckMessage();
+            okResp.setReturnCode(ConnAckMessage.BAD_USERNAME_OR_PASSWORD);
+            session.write(okResp);
+            return;
+        }
+        //}
 
         subscriptions.activate(msg.getClientID());
 
