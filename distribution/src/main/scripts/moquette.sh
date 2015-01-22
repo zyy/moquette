@@ -52,5 +52,38 @@ MOQUETTE_PATH=$MOQUETTE_HOME/
 #LOG_FILE_LEVEL=fine
 JAVA_OPTS_SCRIPT="-XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true"
 
-$JAVA -server $JAVA_OPTS $JAVA_OPTS_SCRIPT -Dlog4j.configuration="file:$LOG_FILE" -Dmoquette.path="$MOQUETTE_PATH" -cp "$MOQUETTE_HOME/lib/moquette-broker-0.6-SNAPSHOT.jar:$MOQUETTE_HOME/lib/*" org.eclipse.moquette.server.Server
+start(){
+nohup $JAVA -server $JAVA_OPTS $JAVA_OPTS_SCRIPT -Dlog4j.configuration="file:$LOG_FILE" -Dmoquette.path="$MOQUETTE_PATH" -cp "$MOQUETTE_HOME/lib/moquette-broker-0.6-SNAPSHOT.jar:$MOQUETTE_HOME/lib/*" org.eclipse.moquette.server.Server $1>/dev/null 2>&1 &
+echo $! > $MOQUETTE_HOME/bin/moquette.pid 
+}
 
+stop(){
+if [ -f $MOQUETTE_HOME/bin/moquette.pid ]; then 
+  PID=$(cat $MOQUETTE_HOME/bin/moquette.pid)
+  kill -9 $PID
+  rm -f $MOQUETTE_HOME/bin/moquette.pid
+fi
+}
+
+case "$1" in
+start)
+  echo "Starting moquette..."
+  start
+  echo "Stop complete!"
+  ;;
+stop)
+  echo "Stoping moquette..."
+  stop
+  echo "Stop complete!"
+  ;;
+restart)
+  echo "Restarting moquette..."
+  stop
+  start
+  echo "Restart complete!"
+  ;;
+*)
+  printf 'Usage: %s {start|stop|restart}\n' "$prog"
+  exit 1
+  ;;
+esac
