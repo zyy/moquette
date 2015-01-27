@@ -21,15 +21,14 @@ import org.eclipse.moquette.proto.messages.AbstractMessage;
 import org.eclipse.moquette.proto.messages.UnsubAckMessage;
 
 /**
- *
  * @author andrea
  */
 class UnsubAckEncoder extends DemuxEncoder<UnsubAckMessage> {
-    
+
     @Override
     protected void encode(ChannelHandlerContext chc, UnsubAckMessage msg, ByteBuf out) {
         out.writeByte(AbstractMessage.UNSUBACK << 4).
-                writeBytes(Utils.encodeRemainingLength(2)).
-                writeShort(msg.getMessageID());
+                writeBytes(Utils.encodeRemainingLength(8)).
+                writeLong(msg.getMessageID());
     }
 }

@@ -25,6 +25,7 @@ import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
 import org.eclipse.moquette.proto.messages.AbstractMessage;
 
 import org.eclipse.moquette.spi.ISessionsStore;
+import org.eclipse.moquette.spi.persistence.model.History;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,12 @@ public class MemoryStorageService implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void saveHistoryMessage(String fromId, String toId, ByteBuffer message) {
+    public void saveHistoryMessage(History history) {
+
+    }
+
+    @Override
+    public void updateReadHistory(Long messageID) {
 
     }
 
@@ -103,7 +109,7 @@ public class MemoryStorageService implements IMessagesStore, ISessionsStore {
     }
     
     @Override
-    public void cleanPersistedPublishMessage(String clientID, int messageID) {
+    public void cleanPersistedPublishMessage(String clientID, Long messageID) {
         List<PublishEvent> events = m_persistentMessageStore.get(clientID);
         PublishEvent toRemoveEvt = null;
         for (PublishEvent evt : events) {

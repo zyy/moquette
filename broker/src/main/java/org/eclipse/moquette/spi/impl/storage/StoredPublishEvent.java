@@ -32,7 +32,7 @@ public class StoredPublishEvent implements Serializable {
     boolean m_retain;
     String m_clientID;
     //Optional attribute, available only fo QoS 1 and 2
-    int m_msgID;
+    long m_msgID;
 
     public StoredPublishEvent() {
     }
@@ -70,7 +70,7 @@ public class StoredPublishEvent implements Serializable {
         return m_clientID;
     }
 
-    public int getMessageID() {
+    public Long getMessageID() {
         return m_msgID;
     }
 }

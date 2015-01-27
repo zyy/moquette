@@ -19,6 +19,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.util.AttributeMap;
+
+import java.nio.charset.Charset;
 import java.util.List;
 import org.eclipse.moquette.proto.messages.AbstractMessage;
 import org.eclipse.moquette.proto.messages.PublishMessage;
@@ -74,7 +76,7 @@ class PublishDecoder extends DemuxDecoder {
         
         if (message.getQos() == AbstractMessage.QOSType.LEAST_ONE || 
                 message.getQos() == AbstractMessage.QOSType.EXACTLY_ONCE) {
-            message.setMessageID(in.readUnsignedShort());
+            message.setMessageID(in.readLong());
         }
         int stopPos = in.readerIndex();
         
@@ -88,7 +90,9 @@ class PublishDecoder extends DemuxDecoder {
         ByteBuf bb = Unpooled.buffer(payloadSize);
         in.readBytes(bb);
         message.setPayload(bb.nioBuffer());
-        
+
+        LOG.debug("Received a PUBLISH with content :" + new String(bb.nioBuffer().array(), Charset.forName("UTF-8")));
+
         out.add(message);
     }
     

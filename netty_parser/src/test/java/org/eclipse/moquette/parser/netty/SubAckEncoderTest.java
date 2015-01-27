@@ -44,7 +44,7 @@ public class SubAckEncoderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testEncodeWithNoQoss() throws Exception {
         SubAckMessage msg = new SubAckMessage();
-        msg.setMessageID(123);
+        msg.setMessageID(123L);
 
         //Exercise
         m_encoder.encode(m_mockedContext, msg, m_out);
@@ -54,7 +54,7 @@ public class SubAckEncoderTest {
     public void testEncodeWithMultipleQos() throws Exception {
         SubAckMessage msg = new SubAckMessage();
 
-        int messageID = 0xAABB;
+        long messageID = 0xAABBL;
         msg.setMessageID(messageID);
         msg.addType(AbstractMessage.QOSType.MOST_ONE);
         msg.addType(AbstractMessage.QOSType.LEAST_ONE);

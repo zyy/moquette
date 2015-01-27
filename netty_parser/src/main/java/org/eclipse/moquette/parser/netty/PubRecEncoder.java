@@ -29,7 +29,7 @@ class PubRecEncoder extends DemuxEncoder<PubRecMessage> {
     @Override
     protected void encode(ChannelHandlerContext chc, PubRecMessage msg, ByteBuf out) {
         out.writeByte(AbstractMessage.PUBREC << 4);
-        out.writeBytes(Utils.encodeRemainingLength(2));
-        out.writeShort(msg.getMessageID());
+        out.writeBytes(Utils.encodeRemainingLength(8));
+        out.writeLong(msg.getMessageID());
     }
 }

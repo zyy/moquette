@@ -94,7 +94,7 @@ public class UnsubscribeDecoderTest {
         assertFalse(m_results.isEmpty());
         UnsubscribeMessage message = (UnsubscribeMessage)m_results.get(0); 
         assertNotNull(message);
-        assertEquals(0x01, (int)message.getMessageID());
+        assertEquals(0x01L, (long)message.getMessageID());
     }
     
     

@@ -45,7 +45,7 @@ public class SubscribeEncoderTest {
     public void testEncodeWithMultiTopic() throws Exception {
         SubscribeMessage msg = new SubscribeMessage();
         msg.setQos(AbstractMessage.QOSType.LEAST_ONE);
-        msg.setMessageID(0xAABB);
+        msg.setMessageID(0xAABBL);
         
         //variable part
         SubscribeMessage.Couple c1 = new SubscribeMessage.Couple((byte)1, "a/b");
@@ -75,7 +75,7 @@ public class SubscribeEncoderTest {
     public void testEncode_empty_subscription() throws Exception {
         SubscribeMessage msg = new SubscribeMessage();
         msg.setQos(AbstractMessage.QOSType.LEAST_ONE);
-        msg.setMessageID(0xAABB);
+        msg.setMessageID(0xAABBL);
 
         //Exercise
         m_encoder.encode(m_mockedContext, msg, m_out);
@@ -85,7 +85,7 @@ public class SubscribeEncoderTest {
     public void testEncode_badQos() throws Exception {
         SubscribeMessage msg = new SubscribeMessage();
         msg.setQos(AbstractMessage.QOSType.EXACTLY_ONCE);
-        msg.setMessageID(0xAABB);
+        msg.setMessageID(0xAABBL);
 
         //Exercise
         m_encoder.encode(m_mockedContext, msg, m_out);

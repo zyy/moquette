@@ -39,7 +39,7 @@ abstract class MessageIDDecoder extends DemuxDecoder {
         }
         
         //read  messageIDs
-        message.setMessageID(in.readUnsignedShort());
+        message.setMessageID(in.readLong());
         out.add(message);
     }
     

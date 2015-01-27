@@ -43,7 +43,7 @@ class PublishEncoder extends DemuxEncoder<PublishMessage> {
                 if (message.getMessageID() == null) {
                     throw new IllegalArgumentException("Found a message with QOS 1 or 2 and not MessageID setted");
                 }
-                variableHeaderBuff.writeShort(message.getMessageID());
+                variableHeaderBuff.writeLong(message.getMessageID());
             }
             variableHeaderBuff.writeBytes(message.getPayload());
             int variableHeaderSize = variableHeaderBuff.readableBytes();

@@ -37,10 +37,10 @@ class UnsubscribeEncoder extends DemuxEncoder<UnsubscribeMessage> {
             throw new IllegalArgumentException("Expected a message with QOS 1, found " + message.getQos());
         }
         
-        ByteBuf variableHeaderBuff = chc.alloc().buffer(4);
+        ByteBuf variableHeaderBuff = chc.alloc().buffer(10);
         ByteBuf buff = null;
         try {
-            variableHeaderBuff.writeShort(message.getMessageID());
+            variableHeaderBuff.writeLong(message.getMessageID());
             for (String topic : message.topicFilters()) {
                 variableHeaderBuff.writeBytes(Utils.encodeString(topic));
             }

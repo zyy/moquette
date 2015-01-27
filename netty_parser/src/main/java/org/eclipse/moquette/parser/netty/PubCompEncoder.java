@@ -29,7 +29,7 @@ class PubCompEncoder extends DemuxEncoder<PubCompMessage> {
     @Override
     protected void encode(ChannelHandlerContext chc, PubCompMessage msg, ByteBuf out) {
         out.writeByte(AbstractMessage.PUBCOMP << 4);
-        out.writeBytes(Utils.encodeRemainingLength(2));
-        out.writeShort(msg.getMessageID());
+        out.writeBytes(Utils.encodeRemainingLength(8));
+        out.writeLong(msg.getMessageID());
     }
 }

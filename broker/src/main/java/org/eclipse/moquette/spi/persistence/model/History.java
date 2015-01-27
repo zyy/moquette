@@ -5,6 +5,7 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by yycoder on 2015/1/13.
@@ -12,45 +13,55 @@ import java.util.Date;
 @Entity(value = "history", noClassnameStored = true)
 public class History {
     @Id
-    private ObjectId id;
-    private String fromId;
-    private String toId;
+    private long messageId;
+    private String sendId;
+    private String topic;
     private Date time;
-    private String message;
+    private String content;
+    private boolean isRead;
 
     public History() {
     }
 
-    public History(String fromId, String toId, String message) {
-        this.id = new ObjectId();
-        this.fromId = fromId;
-        this.toId = toId;
-        this.message = message;
+    public History(Long messageId, String sendId, String topic, String content) {
+        this.messageId = messageId;
+        this.sendId = sendId;
+        this.topic = topic;
+        this.time = new Date();
+        this.content = content;
+    }
+
+    public History(long messageId, String sendId, String topic, String content, boolean isRead) {
+        this.messageId = messageId;
+        this.sendId = sendId;
+        this.topic = topic;
+        this.content = content;
+        this.isRead = isRead;
         this.time = new Date();
     }
 
-    public ObjectId getId() {
-        return id;
+    public String getSendId() {
+        return sendId;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setSendId(String sendId) {
+        this.sendId = sendId;
     }
 
-    public String getFromId() {
-        return fromId;
+    public String getTopic() {
+        return topic;
     }
 
-    public void setFromId(String fromId) {
-        this.fromId = fromId;
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
-    public String getToId() {
-        return toId;
+    public String getContent() {
+        return content;
     }
 
-    public void setToId(String toId) {
-        this.toId = toId;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getTime() {
@@ -61,11 +72,19 @@ public class History {
         this.time = time;
     }
 
-    public String getMessage() {
-        return message;
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
     }
 }

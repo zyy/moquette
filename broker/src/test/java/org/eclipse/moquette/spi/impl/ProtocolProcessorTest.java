@@ -557,7 +557,7 @@ public class ProtocolProcessorTest {
         msg.setQos(QOSType.LEAST_ONE);
         msg.setPayload(payload);
         msg.setRetainFlag(true);
-        msg.setMessageID(100);
+        msg.setMessageID(100L);
         m_processor.processPublish(m_session, msg);
         
         //Exercise

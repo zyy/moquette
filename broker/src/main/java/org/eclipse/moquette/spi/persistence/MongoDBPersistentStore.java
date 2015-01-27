@@ -34,14 +34,10 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
     private Properties props;
     private MongoClient mongoClient;
     private RetainedDao retainedDao;
-    //maps clientID to the list of pending messages stored
-    private PersistentDao persistentDao;
     //bind clientID+MsgID -> evt message published
     private InfightDao inflightDao;
     //bind clientID+MsgID -> evt message published
     private QoS2Dao qos2Dao;
-    //persistent Map of clientID, set of Subscriptions
-    private SubscriptionsDao subscriptionsDao;
     //persistent message history
     private HistoryDao historyDao;
 
@@ -61,9 +57,7 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
             String mongo_db = props.getProperty("mongo_db");
             Morphia morphia = new Morphia();
             retainedDao = new RetainedDao(morphia.createDatastore(mongoClient, mongo_db));
-            persistentDao = new PersistentDao(morphia.createDatastore(mongoClient, mongo_db));
             inflightDao = new InfightDao(morphia.createDatastore(mongoClient, mongo_db));
-            subscriptionsDao = new SubscriptionsDao(morphia.createDatastore(mongoClient, mongo_db));
             qos2Dao = new QoS2Dao(morphia.createDatastore(mongoClient, mongo_db));
             historyDao = new HistoryDao(morphia.createDatastore(mongoClient, mongo_db));
         } catch (Exception e) {
@@ -108,32 +102,40 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
 
     @Override
     public void storePublishForFuture(PublishEvent evt) {
-        persistentDao.saveEvent(evt);
+        //persistentDao.saveEvent(evt);
         //NB rewind the evt message content
-        LOG.debug("Stored published message for client <{}> on topic <{}>", evt.getClientID(), evt.getTopic());
+        //LOG.debug("Stored published message for client <{}> on topic <{}>", evt.getClientID(), evt.getTopic());
     }
 
     @Override
     public List<PublishEvent> retrievePersistedPublishes(String clientID) {
-        List<StoredPublishEvent> storedEvts = persistentDao.getByClientID(clientID);
-        if (storedEvts == null) {
-            return null;
+        List<History> historyMessages = historyDao.findUnreadMessage(clientID);
+        if (historyMessages == null || historyMessages.size() ==0) {
+            return Collections.EMPTY_LIST;
         }
         List<PublishEvent> liveEvts = new ArrayList<PublishEvent>();
-        for (StoredPublishEvent storedEvt : storedEvts) {
-            liveEvts.add(convertFromStored(storedEvt));
+        for (History msg : historyMessages) {
+            liveEvts.add(convertFromStored(msg));
         }
         return liveEvts;
     }
 
+    private PublishEvent convertFromStored(History msg) {
+        byte[] message = msg.getContent().getBytes(Charset.forName("UTF-8"));
+        ByteBuffer bbmessage = ByteBuffer.wrap(message);
+        //TODO save Qos and retain, do we need save?
+        PublishEvent liveEvt = new PublishEvent(msg.getTopic(), AbstractMessage.QOSType.LEAST_ONE,
+                bbmessage, false, msg.getTopic(), msg.getMessageId());
+        return liveEvt;
+    }
+
     @Override
-    public void cleanPersistedPublishMessage(String clientID, int messageID) {
-        persistentDao.cleanPublishMessage(clientID, messageID);
+    public void cleanPersistedPublishMessage(String clientID, Long messageID) {
+        //persistentDao.cleanPublishMessage(clientID, messageID);
     }
 
     @Override
     public void cleanPersistedPublishes(String clientID) {
-        persistentDao.cleanPublishes(clientID);
     }
 
     @Override
@@ -149,27 +151,29 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
 
     @Override
     public void addNewSubscription(Subscription newSubscription, String clientID) {
-        LOG.debug("addNewSubscription invoked with subscription {} for client {}", newSubscription, clientID);
-        subscriptionsDao.addNewSubscription(newSubscription, clientID);
+        //LOG.debug("addNewSubscription invoked with subscription {} for client {}", newSubscription, clientID);
+        //subscriptionsDao.addNewSubscription(newSubscription, clientID);
     }
 
     @Override
     public void wipeSubscriptions(String clientID) {
-        subscriptionsDao.wipeSubscriptions(clientID);
+        //subscriptionsDao.wipeSubscriptions(clientID);
     }
 
     @Override
     public void updateSubscriptions(String clientID, Set<Subscription> subscriptions) {
-        subscriptionsDao.updateSubscriptions(clientID, subscriptions);
+        //subscriptionsDao.updateSubscriptions(clientID, subscriptions);
     }
 
     public List<Subscription> listAllSubscriptions() {
-        return subscriptionsDao.listAllSubscriptions();
+        //return subscriptionsDao.listAllSubscriptions();
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public boolean contains(String clientID) {
-        return subscriptionsDao.contains(clientID);
+        //return subscriptionsDao.contains(clientID);
+        return true;
     }
 
     @Override
@@ -192,9 +196,13 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void saveHistoryMessage(String fromId, String toId, ByteBuffer message) {
-        History msg = new History(fromId, toId, new String(message.array(), Charset.forName("UTF-8")));
-        historyDao.save(msg);
+    public void saveHistoryMessage(History history) {
+        historyDao.save(history);
+    }
+
+    @Override
+    public void updateReadHistory(Long messageID) {
+        historyDao.saveReadHistory(messageID);
     }
 
     @Override

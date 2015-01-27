@@ -75,7 +75,7 @@ public class PublishEncoderTest {
         String topic = "/photos";
         PublishMessage msg = new PublishMessage();
         msg.setQos(QOSType.LEAST_ONE);
-        msg.setMessageID(1);
+        msg.setMessageID(1L);
         msg.setTopicName(topic);
 
         //variable part
@@ -114,7 +114,7 @@ public class PublishEncoderTest {
     public void testEncode_empty_topic() throws Exception {
         PublishMessage msg = new PublishMessage();
         msg.setQos(QOSType.LEAST_ONE);
-        msg.setMessageID(1);
+        msg.setMessageID(1L);
         ByteBuf out = Unpooled.buffer();
 
         //Exercise
@@ -125,7 +125,7 @@ public class PublishEncoderTest {
     public void testEncode_null_topic() throws Exception {
         PublishMessage msg = new PublishMessage();
         msg.setQos(QOSType.LEAST_ONE);
-        msg.setMessageID(1);
+        msg.setMessageID(1L);
         msg.setTopicName(null);
 
         //Exercise
@@ -136,7 +136,7 @@ public class PublishEncoderTest {
     public void testEncode_qos_reserved() throws Exception {
         PublishMessage msg = new PublishMessage();
         msg.setQos(QOSType.RESERVED);
-        msg.setMessageID(1);
+        msg.setMessageID(1L);
         msg.setTopicName(null);
 
         //variable part

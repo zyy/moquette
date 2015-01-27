@@ -43,7 +43,7 @@ public class PublishDecoderTest {
     List<Object> m_results;
     AttributeMap m_attrMap;
     
-    private static final int MESSAGE_ID = 123;
+    private static final long MESSAGE_ID = 123;
     
     @Before
     public void setUp() {
@@ -80,7 +80,7 @@ public class PublishDecoderTest {
         PublishMessage message = (PublishMessage)m_results.get(0); 
         assertNotNull(message);
         assertEquals("Fake Topic", message.getTopicName());
-        assertEquals(MESSAGE_ID, (int) message.getMessageID());
+        assertEquals(MESSAGE_ID, (long) message.getMessageID());
     }
     
     
@@ -98,7 +98,7 @@ public class PublishDecoderTest {
         PublishMessage message = (PublishMessage)m_results.get(0); 
         assertNotNull(message);
         assertEquals("Fake Topic", message.getTopicName());
-        assertEquals(MESSAGE_ID, (int) message.getMessageID());
+        assertEquals(MESSAGE_ID, (long) message.getMessageID());
 //        TestUtils.verifyEquals(payload, message.getPayload());
         assertEquals(payload, message.getPayload());
     }
@@ -206,18 +206,18 @@ public class PublishDecoderTest {
         buff.writeBytes(tmp);
     }
     
-    private void initHeaderWithMessageID(ByteBuf buff, int messageID) throws IllegalAccessException {
+    private void initHeaderWithMessageID(ByteBuf buff, Long messageID) throws IllegalAccessException {
         ByteBuf tmp = Unpooled.buffer(4).writeBytes(Utils.encodeString("Fake Topic"));
-        tmp.writeShort(messageID);
+        tmp.writeLong(messageID);
         buff.clear().writeByte(AbstractMessage.PUBLISH << 4 | 0x02) //set Qos to 1
                 .writeBytes(Utils.encodeRemainingLength(tmp.readableBytes()));
         //topic name
         buff.writeBytes(tmp);
     }
      
-    private void initHeaderWithMessageID_Payload(ByteBuf buff, int messageID, byte[] payload) throws IllegalAccessException {
+    private void initHeaderWithMessageID_Payload(ByteBuf buff, Long messageID, byte[] payload) throws IllegalAccessException {
         ByteBuf tmp = Unpooled.buffer(4).writeBytes(Utils.encodeString("Fake Topic"));
-        tmp.writeShort(messageID);
+        tmp.writeLong(messageID);
         tmp.writeBytes(payload);
         buff.clear().writeByte(AbstractMessage.PUBLISH << 4 | 0x02) //set Qos to 1
                 .writeBytes(Utils.encodeRemainingLength(tmp.readableBytes()));
@@ -225,9 +225,9 @@ public class PublishDecoderTest {
         buff.writeBytes(tmp);
     }
     
-    private void initHeaderWithMessageID_Payload(ByteBuf buff, int messageID, ByteBuffer payload) throws IllegalAccessException {
+    private void initHeaderWithMessageID_Payload(ByteBuf buff, Long messageID, ByteBuffer payload) throws IllegalAccessException {
         ByteBuf tmp = Unpooled.buffer(4).writeBytes(Utils.encodeString("Fake Topic"));
-        tmp.writeShort(messageID);
+        tmp.writeLong(messageID);
         tmp.writeBytes(payload);
         buff.clear().writeByte(AbstractMessage.PUBLISH << 4 | 0x02) //set Qos to 1
                 .writeBytes(Utils.encodeRemainingLength(tmp.readableBytes()));
@@ -255,7 +255,7 @@ public class PublishDecoderTest {
         ByteBuf buff = Unpooled.buffer(14);
         ByteBuffer payload = ByteBuffer.allocate(3).put(new byte[]{0x0A, 0x0B, 0x0C});
         ByteBuf tmp = Unpooled.buffer(4).writeBytes(Utils.encodeString("Fake Topic"));
-        tmp.writeShort(MESSAGE_ID);
+        tmp.writeLong(MESSAGE_ID);
         tmp.writeBytes(payload);
         buff.clear().writeByte(AbstractMessage.PUBLISH << 4 | flags) //set DUP=1 Qos to 11 => b1110
                 .writeBytes(Utils.encodeRemainingLength(tmp.readableBytes()));

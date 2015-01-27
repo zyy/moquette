@@ -45,8 +45,8 @@ class UnsubscribeDecoder extends DemuxDecoder {
             
         int start = in.readerIndex();
         //read  messageIDs
-        message.setMessageID(in.readUnsignedShort());
-        int readed = in.readerIndex()- start;
+        message.setMessageID(in.readLong());
+        int readed = in.readerIndex() - start;
         while (readed < message.getRemainingLength()) {
             message.addTopicFilter(Utils.decodeString(in));
             readed = in.readerIndex()- start;

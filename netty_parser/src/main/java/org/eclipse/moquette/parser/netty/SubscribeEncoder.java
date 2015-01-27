@@ -36,10 +36,10 @@ class SubscribeEncoder extends DemuxEncoder<SubscribeMessage> {
             throw new IllegalArgumentException("Expected a message with QOS 1, found " + message.getQos());
         }
         
-        ByteBuf variableHeaderBuff = chc.alloc().buffer(4);
+        ByteBuf variableHeaderBuff = chc.alloc().buffer(10);
         ByteBuf buff = null;
         try {
-            variableHeaderBuff.writeShort(message.getMessageID());
+            variableHeaderBuff.writeLong(message.getMessageID());
             for (SubscribeMessage.Couple c : message.subscriptions()) {
                 variableHeaderBuff.writeBytes(Utils.encodeString(c.getTopicFilter()));
                 variableHeaderBuff.writeByte(c.getQos());

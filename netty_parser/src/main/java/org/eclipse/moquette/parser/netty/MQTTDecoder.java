@@ -20,6 +20,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.util.AttributeKey;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +64,6 @@ public class MQTTDecoder extends ByteToMessageDecoder {
             return;
         }
         in.resetReaderIndex();
-        
         byte messageType = Utils.readMessageType(in);
         
         DemuxDecoder decoder = m_decoderMap.get(messageType);

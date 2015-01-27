@@ -41,7 +41,7 @@ public class UnsubscribeEncoderTest {
         m_mockedContext = mockChannelHandler();
         m_out = Unpooled.buffer();
         m_msg = new UnsubscribeMessage();
-        m_msg.setMessageID(0xAABB);
+        m_msg.setMessageID(0xAABBL);
     }
     
     @Test

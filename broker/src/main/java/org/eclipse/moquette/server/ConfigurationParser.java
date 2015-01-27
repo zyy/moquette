@@ -54,12 +54,13 @@ public class ConfigurationParser {
         m_properties.put("mongo_usr", Constants.MONGO_USR);
         m_properties.put("mongo_pwd", Constants.MONGO_PWD);
         m_properties.put("mongo_maxWaitTime", Constants.MONGO_MAXWAITTIME);
+        m_properties.put("instance_id", Constants.INSTANCE_ID);
     }
 
     /**
      * Parse the configuration from file.
      */
-    void parse(File file) throws ParseException {
+    public void parse(File file) throws ParseException {
         if (file == null) {
             LOG.warn("parsing NULL file, so fallback on default configuration!");
             return;

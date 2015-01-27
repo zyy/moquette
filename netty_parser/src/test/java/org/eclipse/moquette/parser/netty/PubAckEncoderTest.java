@@ -39,7 +39,7 @@ public class PubAckEncoderTest {
     
     @Test
     public void testHeaderEncode() throws Exception {
-        int messageID = 0xAABB;
+        long messageID = 0xAABBL;
         PubAckEncoder encoder = new PubAckEncoder();
         PubAckMessage msg = new PubAckMessage();
         msg.setMessageID(messageID);

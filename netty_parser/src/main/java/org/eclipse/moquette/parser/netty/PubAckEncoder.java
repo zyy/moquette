@@ -28,11 +28,11 @@ class PubAckEncoder extends DemuxEncoder<PubAckMessage> {
 
     @Override
     protected void encode(ChannelHandlerContext chc, PubAckMessage msg, ByteBuf out) {
-        ByteBuf buff = chc.alloc().buffer(4);
+        ByteBuf buff = chc.alloc().buffer(10);
         try {
             buff.writeByte(AbstractMessage.PUBACK << 4);
-            buff.writeBytes(Utils.encodeRemainingLength(2));
-            buff.writeShort(msg.getMessageID());
+            buff.writeBytes(Utils.encodeRemainingLength(8));
+            buff.writeLong(msg.getMessageID());
             out.writeBytes(buff);
         } finally {
             buff.release();

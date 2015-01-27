@@ -31,13 +31,13 @@ public class PublishEvent extends MessagingEvent {
     boolean m_retain;
     String m_clientID;
     //Optional attribute, available only fo QoS 1 and 2
-    int m_msgID;
+    long m_msgID;
 
     public PublishEvent() {
     }
 
     public PublishEvent(String topic, QOSType qos, ByteBuffer message, boolean retain,
-                        String clientID, Integer msgID) {
+                        String clientID, Long msgID) {
         m_topic = topic;
         m_qos = qos;
         m_message = message;
@@ -68,7 +68,7 @@ public class PublishEvent extends MessagingEvent {
         return m_clientID;
     }
 
-    public int getMessageID() {
+    public Long getMessageID() {
         return m_msgID;
     }
 
