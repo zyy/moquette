@@ -1,6 +1,7 @@
 package org.eclipse.moquette.util;
 
 import org.eclipse.moquette.server.ConfigurationParser;
+import org.eclipse.moquette.spi.impl.TopicType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,18 +12,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by larry on 14-5-7.
- * time:41,instanceId:12,sequence:11
- * 21年,4096实例,2048/ms并发
+ * time:41,instanceId:10,sequence:8,type:5
+ * 21年,4096实例,2048/ms并发,32种类型
  */
 public class IDGenerator {
 
     protected static final Logger LOG = LoggerFactory.getLogger(IDGenerator.class);
     private static long epoch = 1321929000000L;
-    private static long instanceIdBits = 12L;
-    private static long sequenceBits = 11L;
+    private static long instanceIdBits = 10L;
+    private static long sequenceBits = 8L;
+    private static long typeBits = 5L;
     private static long maxInstanceId = -1L ^ (-1L << instanceIdBits);
-    private static long instanceIdShift = sequenceBits;
-    private static long timestampLeftShift = sequenceBits + instanceIdBits;
+    private static long sequenceLeftShift = typeBits;
+    private static long instanceIdShift = sequenceBits + typeBits;
+    private static long timestampLeftShift = instanceIdBits + sequenceBits + typeBits;
     private static long instanceId;
     private static long instanceIdValue;
 
@@ -49,28 +52,35 @@ public class IDGenerator {
         return (id >>> timestampLeftShift) + epoch;
     }
 
-    public static long nextId() {
+    public static long nextId(int type) {
         long id;
-        if (sequence.compareAndSet(1999, 0)) {
-            id = ((System.currentTimeMillis() - epoch) << timestampLeftShift) | instanceIdValue | 0;
+        if (sequence.compareAndSet(255, 0)) {
+            id = ((System.currentTimeMillis() - epoch) << timestampLeftShift) | instanceIdValue | (0 << sequenceLeftShift) | type;
         } else {
-            id = ((System.currentTimeMillis() - epoch) << timestampLeftShift) | instanceIdValue | sequence.getAndIncrement();
+            id = ((System.currentTimeMillis() - epoch) << timestampLeftShift) | instanceIdValue
+                    | (sequence.getAndIncrement() << sequenceLeftShift) | type;
         }
         while (id <= lastId) {
             if (System.currentTimeMillis() < parseTimeMillisFromId(id)) {
                 LOG.error(String.format("clock is moving backwards.  Rejecting requests until %d.", parseTimeMillisFromId(id)));
                 throw new RuntimeException(String.format("clock is moving backwards.  Rejecting requests until %d.", parseTimeMillisFromId(id)));
             }
-            id = ((System.currentTimeMillis() - epoch) << timestampLeftShift) | instanceIdValue | sequence.getAndIncrement();
+            id = ((System.currentTimeMillis() - epoch) << timestampLeftShift) | instanceIdValue
+                    | (sequence.getAndIncrement() << sequenceLeftShift) | type;
         }
         return lastId = id;
     }
 
+    public static TopicType getTopicType(long id) {
+        return TopicType.values()[(int) (id & 0x1F)];
+    }
 
     public static void main(String[] args) throws InterruptedException {
         System.out.println(Long.MAX_VALUE);
         System.out.println((System.currentTimeMillis() - 1321929000000l) << 23);
-        System.out.println(nextId());
+        long id = nextId(0);
+        System.out.println(id);
+        System.out.println(getTopicType(id).ordinal());
     }
 
 }

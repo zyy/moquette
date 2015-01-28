@@ -204,8 +204,8 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void updateReadHistory(Long messageID) {
-        singleHistoryDao.saveReadHistory(messageID);
+    public void readSingleHistory(Long messageID) {
+        singleHistoryDao.readSingleHistory(messageID);
     }
 
     @Override

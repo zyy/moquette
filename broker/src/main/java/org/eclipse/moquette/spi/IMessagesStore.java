@@ -113,5 +113,5 @@ public interface IMessagesStore {
 
     void saveSingleHistoryMessage(SingleHistory history);
 
-    void updateReadHistory(Long messageID);
+    void readSingleHistory(Long messageID);
 }

@@ -256,7 +256,13 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         long messageID = msg.getMessageID();
         //Remove the message from message store
         m_messagesStore.cleanPersistedPublishMessage(clientID, messageID);
-        m_messagesStore.updateReadHistory(messageID);
+        TopicType tt = IDGenerator.getTopicType(messageID);
+        if (tt == TopicType.SINGLE) {
+            // update single send message read history
+            m_messagesStore.readSingleHistory(messageID);
+        } else {
+            // update multiple send message read history
+        }
     }
     
     private void cleanSession(String clientID) {
@@ -336,10 +342,10 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
     }
 
     private TopicType getTopicType(String topic) {
-        if (topic.matches("[0-9]+")) {
-            return TopicType.USER;
+        if (topic.matches("[0-9]{18,}")) {
+            return TopicType.SINGLE;
         } else {
-            return TopicType.OTHER;
+            return TopicType.MULTIPLE;
         }
     }
     
@@ -354,15 +360,17 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         }
 
         // replace message identifier
-        Long replacedID = IDGenerator.nextId();
+        Long replacedID;
         // store message history
-        if (getTopicType(topic) == TopicType.USER) {
+        if (getTopicType(topic) == TopicType.SINGLE) {
             // m to m
+            replacedID = IDGenerator.nextId(TopicType.SINGLE.ordinal());
             String msg = new String(origMessage.duplicate().array(), Charset.forName("UTF-8"));
             SingleHistory history = new SingleHistory(replacedID, pubClientID, topic, msg);
             m_messagesStore.saveSingleHistoryMessage(history);
         } else {
             // m to group/tag
+            replacedID = IDGenerator.nextId(TopicType.MULTIPLE.ordinal());
         }
 
 

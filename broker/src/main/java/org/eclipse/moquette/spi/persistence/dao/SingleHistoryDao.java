@@ -22,7 +22,7 @@ public class SingleHistoryDao extends BasicDAO<SingleHistory, Serializable> {
         return getDs().createQuery(getEntityClazz());
     }
 
-    public UpdateResults saveReadHistory(Long messageID) {
+    public UpdateResults readSingleHistory(Long messageID) {
         Query query = getQuery().disableValidation();
         query.filter("_id", messageID);
         UpdateOperations opts = getDs().createUpdateOperations(getEntityClazz());

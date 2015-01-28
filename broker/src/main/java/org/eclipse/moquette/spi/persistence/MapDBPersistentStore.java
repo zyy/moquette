@@ -85,7 +85,7 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void updateReadHistory(Long messageID) {
+    public void readSingleHistory(Long messageID) {
 
     }
 
