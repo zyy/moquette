@@ -18,6 +18,23 @@ package org.eclipse.moquette.spi.impl;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import org.eclipse.moquette.proto.messages.*;
+import org.eclipse.moquette.proto.messages.AbstractMessage.QOSType;
+import org.eclipse.moquette.server.ConnectionDescriptor;
+import org.eclipse.moquette.server.Constants;
+import org.eclipse.moquette.server.IAuthenticator;
+import org.eclipse.moquette.server.ServerChannel;
+import org.eclipse.moquette.spi.IMatchingCondition;
+import org.eclipse.moquette.spi.IMessagesStore;
+import org.eclipse.moquette.spi.ISessionsStore;
+import org.eclipse.moquette.spi.impl.events.*;
+import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
+import org.eclipse.moquette.spi.impl.subscriptions.SubscriptionsStore;
+import org.eclipse.moquette.spi.persistence.model.SingleHistory;
+import org.eclipse.moquette.util.IDGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -26,36 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.eclipse.moquette.spi.IMatchingCondition;
-import org.eclipse.moquette.spi.IMessagesStore;
-import org.eclipse.moquette.spi.ISessionsStore;
-import org.eclipse.moquette.spi.impl.events.*;
-import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
-import org.eclipse.moquette.spi.impl.subscriptions.SubscriptionsStore;
+
 import static org.eclipse.moquette.parser.netty.Utils.VERSION_3_1;
 import static org.eclipse.moquette.parser.netty.Utils.VERSION_3_1_1;
-import org.eclipse.moquette.proto.messages.AbstractMessage;
-import org.eclipse.moquette.proto.messages.AbstractMessage.QOSType;
-import org.eclipse.moquette.proto.messages.ConnAckMessage;
-import org.eclipse.moquette.proto.messages.ConnectMessage;
-import org.eclipse.moquette.proto.messages.DisconnectMessage;
-import org.eclipse.moquette.proto.messages.PubAckMessage;
-import org.eclipse.moquette.proto.messages.PubCompMessage;
-import org.eclipse.moquette.proto.messages.PubRecMessage;
-import org.eclipse.moquette.proto.messages.PubRelMessage;
-import org.eclipse.moquette.proto.messages.PublishMessage;
-import org.eclipse.moquette.proto.messages.SubAckMessage;
-import org.eclipse.moquette.proto.messages.SubscribeMessage;
-import org.eclipse.moquette.proto.messages.UnsubAckMessage;
-import org.eclipse.moquette.proto.messages.UnsubscribeMessage;
-import org.eclipse.moquette.server.ConnectionDescriptor;
-import org.eclipse.moquette.server.Constants;
-import org.eclipse.moquette.server.IAuthenticator;
-import org.eclipse.moquette.server.ServerChannel;
-import org.eclipse.moquette.spi.persistence.model.History;
-import org.eclipse.moquette.util.IDGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class responsible to handle the logic of MQTT protocol it's the director of
@@ -368,14 +358,9 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         // store message history
         if (getTopicType(topic) == TopicType.USER) {
             // m to m
-            History history;
             String msg = new String(origMessage.duplicate().array(), Charset.forName("UTF-8"));
-            if (qos != QOSType.MOST_ONE) {
-                history = new History(replacedID, pubClientID, topic, msg);
-            } else {
-                history = new History(replacedID, pubClientID, topic, msg, true);
-            }
-            m_messagesStore.saveHistoryMessage(history);
+            SingleHistory history = new SingleHistory(replacedID, pubClientID, topic, msg);
+            m_messagesStore.saveSingleHistoryMessage(history);
         } else {
             // m to group/tag
         }
@@ -391,8 +376,9 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
                     sub.getClientId(), sub.getTopicFilter(), qos, sub.isActive());
 
             if (qos == AbstractMessage.QOSType.MOST_ONE && sub.isActive()) {
-                //QoS 0
-                sendPublish(sub.getClientId(), topic, qos, message, false, replacedID);
+                //QoS 0 , replace QoS to 1,make sure send arrive and receive a PUBACK to update message history
+                //sendPublish(sub.getClientId(), topic, qos, message, false, replacedID);
+                sendPublish(sub.getClientId(), topic, QOSType.LEAST_ONE, message, false, replacedID);
             } else {
                 //QoS 1 or 2
                 //if the target subscription is not clean session and is not connected => store it

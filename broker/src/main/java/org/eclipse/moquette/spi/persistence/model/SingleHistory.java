@@ -10,8 +10,8 @@ import java.util.Set;
 /**
  * Created by yycoder on 2015/1/13.
  */
-@Entity(value = "history", noClassnameStored = true)
-public class History {
+@Entity(value = "singleHistory", noClassnameStored = true)
+public class SingleHistory {
     @Id
     private long messageId;
     private String sendId;
@@ -20,10 +20,10 @@ public class History {
     private String content;
     private boolean isRead;
 
-    public History() {
+    public SingleHistory() {
     }
 
-    public History(Long messageId, String sendId, String topic, String content) {
+    public SingleHistory(Long messageId, String sendId, String topic, String content) {
         this.messageId = messageId;
         this.sendId = sendId;
         this.topic = topic;
@@ -31,7 +31,7 @@ public class History {
         this.content = content;
     }
 
-    public History(long messageId, String sendId, String topic, String content, boolean isRead) {
+    public SingleHistory(long messageId, String sendId, String topic, String content, boolean isRead) {
         this.messageId = messageId;
         this.sendId = sendId;
         this.topic = topic;

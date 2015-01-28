@@ -15,19 +15,18 @@
  */
 package org.eclipse.moquette.spi.impl;
 
-import java.nio.ByteBuffer;
-import java.util.*;
-
+import org.eclipse.moquette.proto.messages.AbstractMessage;
 import org.eclipse.moquette.spi.IMatchingCondition;
 import org.eclipse.moquette.spi.IMessagesStore;
+import org.eclipse.moquette.spi.ISessionsStore;
 import org.eclipse.moquette.spi.impl.events.PublishEvent;
 import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
-import org.eclipse.moquette.proto.messages.AbstractMessage;
-
-import org.eclipse.moquette.spi.ISessionsStore;
-import org.eclipse.moquette.spi.persistence.model.History;
+import org.eclipse.moquette.spi.persistence.model.SingleHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /**
  */
@@ -51,7 +50,7 @@ public class MemoryStorageService implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void saveHistoryMessage(History history) {
+    public void saveSingleHistoryMessage(SingleHistory history) {
 
     }
 

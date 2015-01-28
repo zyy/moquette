@@ -15,12 +15,12 @@
  */
 package org.eclipse.moquette.spi;
 
+import org.eclipse.moquette.proto.messages.AbstractMessage;
+import org.eclipse.moquette.spi.impl.events.PublishEvent;
+import org.eclipse.moquette.spi.persistence.model.SingleHistory;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import org.eclipse.moquette.spi.impl.events.PublishEvent;
-import org.eclipse.moquette.proto.messages.AbstractMessage;
-import org.eclipse.moquette.spi.persistence.model.History;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -111,7 +111,7 @@ public interface IMessagesStore {
 
     void cleanRetained(String topic);
 
-    void saveHistoryMessage(History history);
+    void saveSingleHistoryMessage(SingleHistory history);
 
     void updateReadHistory(Long messageID);
 }

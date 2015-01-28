@@ -17,16 +17,14 @@
 package org.eclipse.moquette.spi.persistence;
 
 import org.eclipse.moquette.proto.MQTTException;
+import org.eclipse.moquette.proto.messages.AbstractMessage;
 import org.eclipse.moquette.spi.IMatchingCondition;
 import org.eclipse.moquette.spi.IMessagesStore;
 import org.eclipse.moquette.spi.ISessionsStore;
 import org.eclipse.moquette.spi.impl.events.PublishEvent;
 import org.eclipse.moquette.spi.impl.storage.StoredPublishEvent;
 import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
-import org.eclipse.moquette.proto.messages.AbstractMessage;
-import static org.eclipse.moquette.server.Server.STORAGE_FILE_PATH;
-
-import org.eclipse.moquette.spi.persistence.model.History;
+import org.eclipse.moquette.spi.persistence.model.SingleHistory;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
@@ -37,6 +35,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+
+import static org.eclipse.moquette.server.Server.STORAGE_FILE_PATH;
 
 /**
  * MapDB main persistence implementation
@@ -81,7 +81,7 @@ public class MapDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void saveHistoryMessage(History history) {
+    public void saveSingleHistoryMessage(SingleHistory history) {
     }
 
     @Override

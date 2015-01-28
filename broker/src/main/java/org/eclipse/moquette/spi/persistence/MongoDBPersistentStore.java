@@ -15,9 +15,12 @@ import org.eclipse.moquette.spi.ISessionsStore;
 import org.eclipse.moquette.spi.impl.events.PublishEvent;
 import org.eclipse.moquette.spi.impl.storage.StoredPublishEvent;
 import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
-import org.eclipse.moquette.spi.persistence.dao.*;
-import org.eclipse.moquette.spi.persistence.model.History;
+import org.eclipse.moquette.spi.persistence.dao.SingleHistoryDao;
+import org.eclipse.moquette.spi.persistence.dao.InfightDao;
+import org.eclipse.moquette.spi.persistence.dao.QoS2Dao;
+import org.eclipse.moquette.spi.persistence.dao.RetainedDao;
 import org.eclipse.moquette.spi.persistence.model.Retained;
+import org.eclipse.moquette.spi.persistence.model.SingleHistory;
 import org.mongodb.morphia.Morphia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +42,7 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
     //bind clientID+MsgID -> evt message published
     private QoS2Dao qos2Dao;
     //persistent message history
-    private HistoryDao historyDao;
+    private SingleHistoryDao singleHistoryDao;
 
     public MongoDBPersistentStore(Properties props) {
         this.props = props;
@@ -59,7 +62,7 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
             retainedDao = new RetainedDao(morphia.createDatastore(mongoClient, mongo_db));
             inflightDao = new InfightDao(morphia.createDatastore(mongoClient, mongo_db));
             qos2Dao = new QoS2Dao(morphia.createDatastore(mongoClient, mongo_db));
-            historyDao = new HistoryDao(morphia.createDatastore(mongoClient, mongo_db));
+            singleHistoryDao = new SingleHistoryDao(morphia.createDatastore(mongoClient, mongo_db));
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("mongo db init error", e);
@@ -109,18 +112,18 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
 
     @Override
     public List<PublishEvent> retrievePersistedPublishes(String clientID) {
-        List<History> historyMessages = historyDao.findUnreadMessage(clientID);
+        List<SingleHistory> historyMessages = singleHistoryDao.findUnreadMessage(clientID);
         if (historyMessages == null || historyMessages.size() ==0) {
             return Collections.EMPTY_LIST;
         }
         List<PublishEvent> liveEvts = new ArrayList<PublishEvent>();
-        for (History msg : historyMessages) {
+        for (SingleHistory msg : historyMessages) {
             liveEvts.add(convertFromStored(msg));
         }
         return liveEvts;
     }
 
-    private PublishEvent convertFromStored(History msg) {
+    private PublishEvent convertFromStored(SingleHistory msg) {
         byte[] message = msg.getContent().getBytes(Charset.forName("UTF-8"));
         ByteBuffer bbmessage = ByteBuffer.wrap(message);
         //TODO save Qos and retain, do we need save?
@@ -196,13 +199,13 @@ public class MongoDBPersistentStore implements IMessagesStore, ISessionsStore {
     }
 
     @Override
-    public void saveHistoryMessage(History history) {
-        historyDao.save(history);
+    public void saveSingleHistoryMessage(SingleHistory history) {
+        singleHistoryDao.save(history);
     }
 
     @Override
     public void updateReadHistory(Long messageID) {
-        historyDao.saveReadHistory(messageID);
+        singleHistoryDao.saveReadHistory(messageID);
     }
 
     @Override

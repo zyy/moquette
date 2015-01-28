@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by larry on 14-5-7.
- * time:40,instanceId:12,sequence:11
- * 21年,4000实例,2000/ms并发
+ * time:41,instanceId:12,sequence:11
+ * 21年,4096实例,2048/ms并发
  */
 public class IDGenerator {
 

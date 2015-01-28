@@ -1,6 +1,6 @@
 package org.eclipse.moquette.spi.persistence.dao;
 
-import org.eclipse.moquette.spi.persistence.model.History;
+import org.eclipse.moquette.spi.persistence.model.SingleHistory;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.dao.BasicDAO;
 import org.mongodb.morphia.query.Query;
@@ -13,9 +13,9 @@ import java.util.List;
 /**
  * Created by yycoder on 2015/1/9.
  */
-public class HistoryDao extends BasicDAO<History, Serializable> {
-    public HistoryDao(Datastore ds) {
-        super(History.class, ds);
+public class SingleHistoryDao extends BasicDAO<SingleHistory, Serializable> {
+    public SingleHistoryDao(Datastore ds) {
+        super(SingleHistory.class, ds);
     }
 
     private Query getQuery() {
@@ -30,7 +30,7 @@ public class HistoryDao extends BasicDAO<History, Serializable> {
         return updateFirst(query, opts);
     }
 
-    public List<History> findUnreadMessage(String clientID) {
+    public List<SingleHistory> findUnreadMessage(String clientID) {
         Query query = getQuery().disableValidation();
         query.filter("topic", clientID);
         query.filter("isRead", false);
