@@ -24,7 +24,7 @@ public class Constants {
     public static final String HOST = "0.0.0.0";
     public static final int DEFAULT_CONNECT_TIMEOUT = 10;
     public static final String AUTHENTICATOR = "all";
-    public static final String PERSISTENT = "mapdb";
+    public static final String PERSISTENT = "mongo";
     public static final String DB_USER = "root";
     public static final String DB_PASSWORD = "root_123";
     public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
@@ -35,4 +35,5 @@ public class Constants {
     public static final String MONGO_USR = "root";
     public static final String MONGO_PWD = "root";
     public static final String MONGO_MAXWAITTIME = "3000";
+    public static final String INSTANCE_ID = "2";
 }
