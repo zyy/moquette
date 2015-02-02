@@ -52,9 +52,6 @@ public class DBAuthenticator implements IAuthenticator {
             initConnection();
             Statement statement = DB_CONNECTION.createStatement();
             ResultSet rs = statement.executeQuery(String.format("select * from users where userId = %d", userId));
-            if (rs.getRow() <= 0) {
-                return null;
-            }
             rs.next();
             return rs.getString("token");
         } catch (Exception e) {
