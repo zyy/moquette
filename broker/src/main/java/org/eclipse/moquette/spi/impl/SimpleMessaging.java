@@ -18,28 +18,29 @@ package org.eclipse.moquette.spi.impl;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import org.eclipse.moquette.proto.messages.AbstractMessage;
+import org.eclipse.moquette.server.IAuthenticator;
+import org.eclipse.moquette.server.Server;
+import org.eclipse.moquette.server.ServerChannel;
+import org.eclipse.moquette.server.netty.AuthenticatorType;
+import org.eclipse.moquette.spi.IMessagesStore;
+import org.eclipse.moquette.spi.IMessaging;
+import org.eclipse.moquette.spi.ISessionsStore;
+import org.eclipse.moquette.spi.impl.events.LostConnectionEvent;
+import org.eclipse.moquette.spi.impl.events.MessagingEvent;
+import org.eclipse.moquette.spi.impl.events.ProtocolEvent;
+import org.eclipse.moquette.spi.impl.events.StopEvent;
+import org.eclipse.moquette.spi.impl.subscriptions.SubscriptionsStore;
+import org.eclipse.moquette.spi.persistence.MapDBPersistentStore;
+import org.eclipse.moquette.spi.persistence.MongoDBPersistentStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.eclipse.moquette.commons.Constants;
-import org.eclipse.moquette.server.Server;
-import org.eclipse.moquette.server.netty.AuthenticatorType;
-import org.eclipse.moquette.spi.IMessaging;
-import org.eclipse.moquette.spi.ISessionsStore;
-import org.eclipse.moquette.spi.IMessagesStore;
-import org.eclipse.moquette.spi.impl.events.*;
-import org.eclipse.moquette.spi.impl.subscriptions.SubscriptionsStore;
-import org.eclipse.moquette.spi.persistence.MapDBPersistentStore;
-import org.eclipse.moquette.proto.messages.*;
-import org.eclipse.moquette.server.IAuthenticator;
-import org.eclipse.moquette.server.ServerChannel;
-import org.eclipse.moquette.spi.persistence.MongoDBPersistentStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Singleton class that orchestrate the execution of the protocol.
@@ -155,7 +156,11 @@ public class SimpleMessaging implements IMessaging, EventHandler<ValueEvent> {
         if (evt instanceof ProtocolEvent) {
             ServerChannel session = ((ProtocolEvent) evt).getSession();
             AbstractMessage message = ((ProtocolEvent) evt).getMessage();
-            annotationSupport.dispatch(session, message);
+            try {
+                annotationSupport.dispatch(session, message);
+            } catch (Throwable th) {
+                LOG.error("Grave error processing the message {} for {}", message, session, th);
+            }
         }
     }
 

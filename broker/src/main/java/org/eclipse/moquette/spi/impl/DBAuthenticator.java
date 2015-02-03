@@ -55,7 +55,7 @@ public class DBAuthenticator implements IAuthenticator {
             rs.next();
             return rs.getString("token");
         } catch (Exception e) {
-            LOG.error("get user token from db error {}", e);
+            LOG.error("get user token from db error {}");
         }
         return null;
     }

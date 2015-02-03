@@ -19,21 +19,21 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import java.util.HashMap;
-import java.util.Map;
 import org.eclipse.moquette.server.Constants;
 import org.eclipse.moquette.server.ServerChannel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author andrea
  */
 public class NettyChannel implements ServerChannel {
-    
+
     private ChannelHandlerContext m_channel;
-    
+
     private Map<Object, AttributeKey<Object>> m_attributesKeys = new HashMap<Object, AttributeKey<Object>>();
-    
+
     private static final AttributeKey<Object> ATTR_KEY_KEEPALIVE = new AttributeKey<Object>(Constants.KEEP_ALIVE);
     private static final AttributeKey<Object> ATTR_KEY_CLEANSESSION = new AttributeKey<Object>(Constants.CLEAN_SESSION);
     private static final AttributeKey<Object> ATTR_KEY_CLIENTID = new AttributeKey<Object>(Constants.ATTR_CLIENTID);
@@ -54,7 +54,7 @@ public class NettyChannel implements ServerChannel {
         Attribute<Object> attr = m_channel.attr(mapKey(key));
         attr.set(value);
     }
-    
+
     private synchronized AttributeKey<Object> mapKey(Object key) {
         if (!m_attributesKeys.containsKey(key)) {
             throw new IllegalArgumentException("mapKey can't find a matching AttributeKey for " + key);
@@ -80,5 +80,11 @@ public class NettyChannel implements ServerChannel {
     public void write(Object value) {
         m_channel.writeAndFlush(value);
     }
-    
+
+    @Override
+    public String toString() {
+        String clientID = (String) getAttribute(Constants.ATTR_CLIENTID);
+        return "session [clientID " + clientID + "]";
+    }
+
 }

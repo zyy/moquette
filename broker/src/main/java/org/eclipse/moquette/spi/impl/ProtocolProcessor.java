@@ -238,7 +238,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
     private void republishStored(String clientID) {
         LOG.trace("republishStored invoked");
         List<PublishEvent> publishedEvents = m_messagesStore.retrievePersistedPublishes(clientID);
-        if (publishedEvents == null) {
+        if (publishedEvents.isEmpty()) {
             LOG.info("No stored messages for client <{}>", clientID);
             return;
         }
@@ -247,6 +247,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         for (PublishEvent pubEvt : publishedEvents) {
             sendPublish(pubEvt.getClientID(), pubEvt.getTopic(), pubEvt.getQos(),
                    pubEvt.getMessage(), false, pubEvt.getMessageID());
+            m_messagesStore.cleanPersistedPublishMessage(clientID, pubEvt.getMessageID());
         }
     }
     
