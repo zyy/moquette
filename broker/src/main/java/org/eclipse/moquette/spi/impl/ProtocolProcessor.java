@@ -229,10 +229,10 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         LOG.info("Create persistent session for clientID {}", msg.getClientID());
         m_sessionsStore.addNewSubscription(Subscription.createEmptySubscription(msg.getClientID(), true), msg.getClientID()); //null means EmptySubscription
         
-        if (!msg.isCleanSession()) {
+        //if (!msg.isCleanSession()) {
             //force the republish of stored QoS1 and QoS2
-            republishStored(msg.getClientID());
-        }
+        republishStored(msg.getClientID());
+        //}
     }
     
     private void republishStored(String clientID) {
